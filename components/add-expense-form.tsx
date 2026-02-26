@@ -113,7 +113,6 @@ export function AddExpenseForm({
             id="expense-title"
             name="title"
             type="text"
-            required
             placeholder={t.expenseTitlePlaceholder}
             className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
@@ -140,7 +139,7 @@ export function AddExpenseForm({
 
       {/* Currency and Date row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+        <div className="min-w-0">
           <label
             htmlFor="expense-currency"
             className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
@@ -160,7 +159,7 @@ export function AddExpenseForm({
             ))}
           </select>
         </div>
-        <div>
+        <div className="min-w-0">
           <label
             htmlFor="expense-date"
             className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1"
@@ -172,7 +171,7 @@ export function AddExpenseForm({
             type="date"
             value={selectedDate}
             onChange={(e) => setSelectedDate(e.target.value)}
-            className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="w-full min-w-0 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
         </div>
       </div>

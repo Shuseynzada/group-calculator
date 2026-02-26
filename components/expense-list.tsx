@@ -39,7 +39,7 @@ export function ExpenseList({ expenses, members, onExpenseUpdated, onExpenseDele
 
   function saveEdit(expenseId: string) {
     const trimmedTitle = editTitle.trim();
-    if (!trimmedTitle || !editAmount || !editPayer || editParticipants.size === 0) return;
+    if (!editAmount || !editPayer || editParticipants.size === 0) return;
     const updated = updateExpense(
       expenseId,
       trimmedTitle,
@@ -111,23 +111,27 @@ export function ExpenseList({ expenses, members, onExpenseUpdated, onExpenseDele
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <select
-                  value={editCurrency}
-                  onChange={(e) => setEditCurrency(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                >
-                  {CURRENCIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.symbol} {c.code} — {lang === "az" ? c.nameAz : c.name}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  type="date"
-                  value={editDate}
-                  onChange={(e) => setEditDate(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                />
+                <div className="min-w-0">
+                  <select
+                    value={editCurrency}
+                    onChange={(e) => setEditCurrency(e.target.value)}
+                    className="w-full rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  >
+                    {CURRENCIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.symbol} {c.code} — {lang === "az" ? c.nameAz : c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="min-w-0">
+                  <input
+                    type="date"
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                    className="w-full min-w-0 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  />
+                </div>
               </div>
               <select
                 value={editPayer}
@@ -174,7 +178,7 @@ export function ExpenseList({ expenses, members, onExpenseUpdated, onExpenseDele
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
                 <h4 className="font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                  {expense.title}
+                  {expense.title || formatMoney(expense.amount_cents, expCurrency)}
                 </h4>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                   {t.paidBy} <span className="font-medium text-zinc-700 dark:text-zinc-300">{payerName}</span>

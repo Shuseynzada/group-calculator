@@ -19,8 +19,8 @@ export const addExpenseSchema = z.object({
   group_id: z.string().uuid("Invalid group ID"),
   title: z
     .string()
-    .min(1, "Title is required")
-    .max(200, "Title must be 200 characters or less"),
+    .max(200, "Title must be 200 characters or less")
+    .default(""),
   amount: z
     .string()
     .min(1, "Amount is required")
