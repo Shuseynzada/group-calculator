@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { Member, ExpenseWithParticipants, MemberBalance, Settlement } from "@/lib/types";
 import { computeBalances, suggestSettlements } from "@/lib/split";
 import { useTranslations } from "@/lib/i18n";
@@ -35,6 +35,24 @@ export function GroupDashboard({
   const [expenses, setExpenses] = useState<ExpenseWithParticipants[]>(initialExpenses);
   const [balances, setBalances] = useState<MemberBalance[]>([]);
   const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  // Check if tabs overflow (more content to the right)
+  const checkTabsOverflow = useCallback(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const hasOverflow = el.scrollWidth > el.clientWidth;
+    const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 4;
+    setShowScrollHint(hasOverflow && !atEnd);
+  }, []);
+
+  // Recheck on mount and when language changes (tab labels change width)
+  useEffect(() => {
+    checkTabsOverflow();
+    window.addEventListener("resize", checkTabsOverflow);
+    return () => window.removeEventListener("resize", checkTabsOverflow);
+  }, [checkTabsOverflow, t]);
 
   // Default currency for balances/settlements — always the saved base currency
   const defaultCurrencyConfig: CurrencyConfig = getCurrencyConfig(getSavedCurrency());
@@ -88,31 +106,48 @@ export function GroupDashboard({
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 border-b border-zinc-200 dark:border-zinc-700 mb-6 overflow-x-auto">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-              activeTab === tab.key
-                ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
-                : "border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600"
-            }`}
-          >
-            {tab.label}
-            {tab.count !== undefined && (
-              <span
-                className={`ml-1.5 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs ${
-                  activeTab === tab.key
-                    ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400"
-                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
-                }`}
-              >
-                {tab.count}
-              </span>
-            )}
-          </button>
-        ))}
+      <div className="relative mb-6">
+        <div
+          ref={tabsRef}
+          onScroll={checkTabsOverflow}
+          className="flex gap-1 border-b border-zinc-200 dark:border-zinc-700 overflow-x-auto scrollbar-hide"
+        >
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                activeTab === tab.key
+                  ? "border-emerald-500 text-emerald-600 dark:text-emerald-400"
+                  : "border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600"
+              }`}
+            >
+              {tab.label}
+              {tab.count !== undefined && (
+                <span
+                  className={`ml-1.5 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs ${
+                    activeTab === tab.key
+                      ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400"
+                      : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+                  }`}
+                >
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+        {/* Scroll hint: fade + animated arrow */}
+        {showScrollHint && (
+          <div className="absolute right-0 top-0 bottom-0 flex items-center pointer-events-none">
+            <div className="w-12 h-full bg-gradient-to-l from-white dark:from-zinc-900 to-transparent" />
+            <div className="absolute right-1 animate-bounce-x">
+              <svg className="w-4 h-4 text-zinc-400 dark:text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tab Content */}
